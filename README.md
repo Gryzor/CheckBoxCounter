@@ -15,3 +15,6 @@ Let the Activity (through a ViewModel -not included in the demo-) deal with what
 
 This project simply shows a list of "Things" and a checkbox for each. There's a counter at the top that ... err... _counts_ the number of checked items at any given time. 
 
+This is how it looks:
+
+![CheckBoxCounter](screenshot.png)
