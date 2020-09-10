@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeThings() = viewModel.observeThingsList().observe(this) {
         adapter.submitList(it)
+
+        // TODO: don't use this, instead keep track of the position and update just that location
+        // via notifyItemChanged(...)
+        adapter.notifyDataSetChanged()
     }
 
     @SuppressLint("SetTextI18n")
