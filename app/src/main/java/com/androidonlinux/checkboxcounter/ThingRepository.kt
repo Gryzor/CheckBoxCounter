@@ -8,13 +8,15 @@ class FakeDataRepository {
 
     private fun createFakeData() {
         for (i in 1..1000) {
-            listOfData.add(Thing(i, "This is Item $i", false))
+            listOfData.add(Thing(i.toLong(), "This is Item $i", false))
         }
     }
 
     init {
         createFakeData()
     }
+
+    fun positionOf(thing: Thing) = listOfData.indexOf(thing)
 
     fun getData(): List<Thing> {
         return ArrayList(listOfData)

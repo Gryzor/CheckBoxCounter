@@ -56,6 +56,11 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        val item = getItem(position) as Thing
+        return item.id
+    }
+
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position) as Thing
 

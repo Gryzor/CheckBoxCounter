@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private var adapter: ThingAdapter = ThingAdapter()
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        adapter.setHasStableIds(true)
+        mainRecyclerView.itemAnimator = null //horrible hack, but prevents flick.
         adapter.thingClickListener = listener
         mainRecyclerView.adapter = adapter
 
@@ -36,12 +39,15 @@ class MainActivity : AppCompatActivity() {
         updateCounter(it)
     }
 
-    private fun observeThings() = viewModel.observeThingsList().observe(this) {
-        adapter.submitList(it)
-
-        // TODO: don't use this, instead keep track of the position and update just that location
-        // via notifyItemChanged(...)
-        adapter.notifyDataSetChanged()
+    private fun observeThings() = viewModel.observeData().observe(this) {
+        adapter.submitList(it.first)
+        if (it.second.isNotEmpty()) {
+            it.second.forEach { pos ->
+                adapter.notifyItemChanged(pos)
+            }
+        } else {
+            adapter.notifyDataSetChanged()
+        }
     }
 
     @SuppressLint("SetTextI18n")
