@@ -20,6 +20,14 @@ class FakeDataRepository {
         return ArrayList(listOfData)
     }
 
+    fun toggle(thing: Thing, isNowChecked: Boolean) {
+        val foundThing = listOfData.find { thing.id == it.id }
+        foundThing?.let {
+            thing.isSelected = isNowChecked
+            thing.progress = null
+        }
+    }
+
     suspend fun simulateLongOperation() = flow {
         delay(500)
         emit(10)
@@ -35,5 +43,12 @@ class FakeDataRepository {
         emit(90)
         delay(300)
         emit(100)
+    }
+
+    fun updateThingProgress(thing: Thing, progress: Int) {
+        val foundThing = listOfData.find { thing.id == it.id }
+        foundThing?.let {
+            thing.progress = progress
+        }
     }
 }

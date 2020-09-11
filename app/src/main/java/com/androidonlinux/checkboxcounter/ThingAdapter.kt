@@ -81,8 +81,7 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
 
         init {
             itemView.setOnClickListener {
-                checkBoxView.toggle()
-                toggleListener?.onItemToggled(checkBoxView.isChecked, layoutPosition)
+                toggleListener?.onItemToggled(checkBoxView.isChecked.not(), layoutPosition)
             }
         }
 

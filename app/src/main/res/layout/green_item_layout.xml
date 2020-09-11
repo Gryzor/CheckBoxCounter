@@ -4,6 +4,9 @@
     android:id="@+id/item_root"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
     android:background="@android:color/holo_green_light"
     android:padding="16dp">
 
@@ -25,6 +28,9 @@
         android:id="@+id/checkBoxView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@id/item_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/item_text"

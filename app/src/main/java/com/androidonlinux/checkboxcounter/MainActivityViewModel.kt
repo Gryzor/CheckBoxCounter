@@ -1,18 +1,23 @@
 package com.androidonlinux.checkboxcounter
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel : ViewModel() {
-    private val repository = FakeDataRepository()
+    private val _listSource = MutableLiveData<MutatedThings>()
 
+    private val repository = FakeDataRepository()
     private val _thingsList = MutableLiveData<List<Thing>>()
-    private var _checkedCount = MutableLiveData(0)
+    private var _checkedCount: LiveData<Int> = Transformations.switchMap(_thingsList) { list ->
+        val count = list.count { it.isSelected }
+        MutableLiveData(count)
+    }
+
+    fun observeData(): LiveData<MutatedThings> {
+        return _listSource
+    }
 
     fun observeThingsList(): LiveData<List<Thing>> {
         return _thingsList
@@ -30,39 +35,21 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun onThingClicked(thing: Thing, isChecked: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
 
-        if (isChecked.not()) {
-            // The user unselected this Thing
-            thing.isSelected = false
-            thing.progress = null
-            updateCheckedCount(isChecked)
-            return
-        }
-
-        viewModelScope.launch {
-            repository.simulateLongOperation().collect { progress ->
-
-                val list = _thingsList.value
-                val clickedThing = list?.find { thing.id == it.id }
-                clickedThing?.progress = progress
-
-                if (progress == 100) {
-                    thing.isSelected = isChecked
-                    clickedThing?.progress = null
-                    updateCheckedCount(isChecked)
+            if (isChecked) {
+                repository.simulateLongOperation().collect { progress ->
+                    if (progress == 100) {
+                        repository.toggle(thing, isChecked)
+                    } else {
+                        repository.updateThingProgress(thing, progress)
+                    }
+                    _thingsList.notifyObserver()
                 }
-
-                _thingsList.postValue(list ?: emptyList())
+            } else {
+                repository.toggle(thing, false)
+                _thingsList.notifyObserver()
             }
         }
-    }
-
-    private fun updateCheckedCount(isChecked: Boolean) {
-        val value = if (isChecked) {
-            _checkedCount.value?.plus(1)
-        } else {
-            _checkedCount.value?.minus(1)
-        }
-        _checkedCount.postValue(value)
     }
 }
