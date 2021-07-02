@@ -1,7 +1,7 @@
 # CheckBoxCounter
 Simple Demo To Count Items Checked in a RecyclerView
 
-The idea is to demonstrate one relatively simple way to pass "click" events to higher levels. 
+The idea is to demonstrate one relatively simple way to pass "click" events to higher levels and how to perform long-running operations on view holders (e.g. to show a progress bar while you wait for some operation to complete).
 
 After years of StackOverflow, I realized that most people (myself included!) tend to put their logic in the wrong places.
 When dealing with a Recyclerview, there's a lot going on (as better as it is compared to the old ListView, it's still very _boilerplatty_).
