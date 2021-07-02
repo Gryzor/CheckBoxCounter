@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 
-class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallback()) {
+class ThingAdapter : ListAdapter<Thing, ThingAdapter.BaseViewHolder>(DiffUtilCallback()) {
 
     var thingClickListener: ThingClickListener? = null
 
@@ -22,15 +22,7 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
         const val InProgress = 1
     }
 
-    private var toggleListener: ToggleListener = object : ToggleListener {
-        override fun onItemToggled(isChecked: Boolean, position: Int) {
-            Log.d("XXX", "IsChecked: $isChecked at $position")
-            val thing = getItem(position)
-            thingClickListener?.onThingClicked(thing, isChecked)
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         return when (viewType) {
@@ -41,7 +33,7 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
                         parent,
                         false
                     ),
-                    toggleListener
+                    thingClickListener
                 )
             }
             else -> {
@@ -69,31 +61,27 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as BaseViewHolder).bind(getItem(position))
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 
-    internal abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun bind(data: Thing)
     }
 
     internal class ColoredViewHolder(
         itemView: View,
-        private val toggleListener: ToggleListener?
+        private val toggleListener: ThingClickListener?
     ) : BaseViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(R.id.item_text)
         private val checkBoxView: CheckBox = itemView.findViewById(R.id.checkBoxView)
 
-        init {
-            itemView.setOnClickListener {
-                toggleListener?.onItemToggled(checkBoxView.isChecked.not(), layoutPosition)
-            }
-        }
-
-        @SuppressLint("SetTextI18n")
         override fun bind(data: Thing) {
             title.text = data.title
             checkBoxView.isChecked = data.isSelected
+            itemView.setOnClickListener {
+                toggleListener?.onThingClicked(data, data.isSelected.not())
+            }
         }
     }
 
@@ -125,9 +113,5 @@ class ThingAdapter : ListAdapter<Thing, RecyclerView.ViewHolder>(DiffUtilCallbac
             Log.d("TAG", "areContents The Same: {$areSame}")
             return areSame
         }
-    }
-
-    interface ToggleListener {
-        fun onItemToggled(isChecked: Boolean, position: Int)
     }
 }
